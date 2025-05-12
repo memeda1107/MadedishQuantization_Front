@@ -52,7 +52,7 @@
             </a-col>
         </a-row>
         <a-divider>题材回顾</a-divider>
-        <DtaTable></DtaTable>
+        <DtaTable :id="id"></DtaTable>
         <a-divider>明日板块与龙头人气股推演</a-divider>
         <a-form-item label="板块是否分歧" name="anyDifferencesSectors" style="min-width: 1500px;alignment: left" >
             <a-textarea v-model:value="formState.anyDifferencesSectors" :rows="2"  />
@@ -76,30 +76,33 @@
     </a-form>
 </template>
 <script setup>
-    import { reactive } from 'vue';
+    import { ref,reactive } from 'vue';
     import DtaTable from '../components/DataTable'
     import axios from 'axios';
+    import { message } from 'ant-design-vue';
+
+    let id = ref(0);
 
 
     const formState = reactive({
-        income: '',
+        income: 0,
         marketTrend: '',
-        marketIncrease: '',
-        turnover:'',
-        numberOfRising:'',
-        numberOfFalling:'',
-        NumberOfLimitUp:'',
-        NumberOfLimitDown:'',
-        explosionRate:'',
-        yesterdayLimitUp:'',
-        yesterdayConnectingPlate:'',
-        ShortTermFunds:'',
+        marketIncrease: 0,
+        turnover:0,
+        numberOfRising:0,
+        numberOfFalling:0,
+        NumberOfLimitUp:0,
+        NumberOfLimitDown:0,
+        explosionRate:0,
+        yesterdayLimitUp:0,
+        yesterdayConnectingPlate:0,
+        ShortTermFunds:0,
         overallMarketReview:'',
         anyDifferencesSectors:'',
         expectedLeaders:'',
         todayBestSolution:'',
         mistakesMadeToday:'',
-        record_date:''
+        recordDate:new Date().toLocaleDateString(),
 
     });
     const onFinish = values => {
@@ -114,8 +117,10 @@
     function submit(){
         axios.post('http://127.0.0.1:5000/api/addDiary', formState)
             .then(response => {
-                console.log('Response:', response);
+                console.log('Response:', response.data.id);
                 // 处理成功响应，例如显示成功消息等
+                id.value=response.data.id;
+                message.success('保存成功', response.data.id);
             })
             .catch(error => {
                 console.error('Error:', error);
