@@ -4,7 +4,7 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import {  createEventId } from './event-utils'
+import { createEventId, INITIAL_EVENTS } from './event-utils'
 import axios from 'axios';
 // import { forEach } from 'core-js/core/array'
 export default defineComponent({
@@ -25,7 +25,7 @@ export default defineComponent({
           right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         initialView: 'dayGridMonth',
-        initialEvents: [], // alternatively, use the `events` setting to fetch from a feed
+        initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
         editable: true,
         selectable: true,
         selectMirror: true,
@@ -33,7 +33,9 @@ export default defineComponent({
         weekends: true,
         select: this.handleDateSelect,
         eventClick: this.handleEventClick,
-        eventsSet: this.handleEvents
+        eventsSet: this.handleEvents,
+        events: [],
+        eventColor: '#378006'
         /* you can update a remote database when these fire:
         eventAdd:
         eventChange:
@@ -47,73 +49,44 @@ export default defineComponent({
     this.init()
   },
   methods: {
-    init(){
-    //   nextTick(()=>{
-    //     let calendarApi = this.$refs['fullCalendar'].getApi()
-    //     calendarApi.view.calendar.render()
-    //   })
+    init() {
+      axios.get('http://127.0.0.1:5000/api/get_events')
+        .then(response => {
+          console.log('。。。。。。。。。。。。。。。。。。。Response:', response.data);
+          this.calendarOptions.events = response.data
+          // this.currentEvents=response.data
+          console.log('。。。。。。。。。。。。。。。。。。。events:', this.calendarOptions.events);
 
-axios.get('http://127.0.0.1:5000/api/get_events', async (req, res) => {
-  try {
-    const { start, end } = req.query;
-    // 查询数据库获取指定时间范围内的事件
-    const events = await Event.find({
-      start_time: { $lte: new Date(end) },
-      end_time: { $gte: new Date(start) }
-    }).then(response => {
-                console.log('Response:', response);
-                response.forEach(res => {
-                     res.start.toISOString().replace(/T.*$/, '') 
-            });
-                this.calendarOptions.initialEvents.values=response;
-                console.log(this.calendarOptions.initialEvents);
-            });
+        
+          // 处理成功响应，例如显示成功消息等
+          // message.success('保存成功', 3);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // 处理错误响应，例如显示错误消息等
+        });
+    },
 
-    res.json(events);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: '服务器错误' });
-  }
-});
-// const { start, end } = req.query;
-    // 查询数据库获取指定时间范围内的事件
-    // const events = await Event.find({
-    //   start_time: { $lte: new Date(end) },
-    //   end_time: { $gte: new Date(start) },
-
-// const params = {
-//     start:fetchInfo.start.toISOString(),
-//     end:fetchInfo.end.toISOString(),
-//    };
-   
-// axios.get('http://127.0.0.1:5000/api/get_events', params)
-//             .then(response => {
-//                 console.log('Response:', response);
-//                 // 处理成功响应，例如显示成功消息等
-//                 // message.success('保存成功', 3);
-//             })
-//             .catch(error => {
-//                 console.error('Error:', error);
-//                 // 处理错误响应，例如显示错误消息等
-//             });
-
-
-
-
-
-
+    getColor(event) {
+      return event.income > 0 ? 'red' : event.income < 0 ? 'green' : 'inherit';
     },
     handleWeekendsToggle() {
       this.calendarOptions.weekends = !this.calendarOptions.weekends // update a property
     },
     handleDateSelect(selectInfo) {
-        const vm = this;
-        return vm.$router.push({ name: "ReviewDiary",param:createEventId,selectInfo});
+      const vm = this;
+      return vm.$router.push({ name: "ReviewDiary", param: createEventId, selectInfo });
     },
     handleEventClick(clickInfo) {
-      if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-        clickInfo.event.remove()
-      }
+      console.log(clickInfo)
+      const vm = this;
+      vm.$router.push({
+        name: "ReviewDiary",
+        query: {
+          id: clickInfo.event.id,
+          type: "edit"
+        }
+      });
     },
     handleEvents(events) {
       this.currentEvents = events
@@ -136,11 +109,7 @@ axios.get('http://127.0.0.1:5000/api/get_events', async (req, res) => {
       </div>
       <div class='demo-app-sidebar-section'>
         <label>
-          <input
-            type='checkbox'
-            :checked='calendarOptions.weekends'
-            @change='handleWeekendsToggle'
-          />
+          <input type='checkbox' :checked='calendarOptions.weekends' @change='handleWeekendsToggle' />
           toggle weekends
         </label>
       </div>
@@ -155,13 +124,14 @@ axios.get('http://127.0.0.1:5000/api/get_events', async (req, res) => {
       </div>
     </div>
     <div class='demo-app-main'>
-      <FullCalendar
-        class='demo-app-calendar'
-        :options='calendarOptions'
-      >
+      <FullCalendar class='demo-app-calendar' :options='calendarOptions'>
         <template v-slot:eventContent='arg'>
-          <b>{{ arg.timeText }}</b>
-          <i>{{ arg.event.title }}</i>
+          <i :class="arg.event.income > 0 ? 'fa fa-arrow-up red' : 'fa fa-arrow-down green'"></i>
+          <i :style="{ color: arg.event.extendedProps.income > 0 ? 'red' : arg.event.extendedProps.income< 0 ? 'green' : 'inherit' }">
+            {{ arg.event.title }}
+          </i>
+           <i>{{console.log('...............arg',arg.event.extendedProps.income)}}</i>
+          
         </template>
       </FullCalendar>
     </div>
@@ -169,7 +139,6 @@ axios.get('http://127.0.0.1:5000/api/get_events', async (req, res) => {
 </template>
 
 <style lang='css'>
-
 h2 {
   margin: 0;
   font-size: 16px;
@@ -185,7 +154,8 @@ li {
   padding: 0;
 }
 
-b { /* used for event dates/times */
+b {
+  /* used for event dates/times */
   margin-right: 3px;
 }
 
@@ -212,9 +182,9 @@ b { /* used for event dates/times */
   padding: 3em;
 }
 
-.fc { /* the calendar root */
+.fc {
+  /* the calendar root */
   max-width: 1100px;
   margin: 0 auto;
 }
-
 </style>
