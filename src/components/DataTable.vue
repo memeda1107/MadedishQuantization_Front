@@ -23,6 +23,10 @@
                     </span>
                     <span v-else>
                         <a @click="edit(record.key)">编辑</a>
+                        <!-- <a @click="delete(record.key)">删除</a> -->
+                        <a-popconfirm v-if="dataSource.length" title="确认删除？" @confirm="onDelete(record.key)">
+                            <a>删除</a>
+                        </a-popconfirm>
                     </span>
                 </div>
             </template>
@@ -31,7 +35,7 @@
 </template>
 <script setup>
 import { cloneDeep } from 'lodash-es';
-import { computed, reactive, ref, onMounted } from 'vue';
+import { computed, reactive, ref, onMounted,watch } from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
 
@@ -42,6 +46,10 @@ const props = defineProps({
     date: String
 
 })
+watch(
+  () => props.id,
+  (newVal) => console.log('id已更新:', newVal)
+);
 onMounted(() => {
     init();
     //   getMonthDates()
@@ -69,8 +77,8 @@ function init() {
                     persistence: response.data[i].persistence,
                     // date: props.date,
                     reviewDiaryId: response.data[i].reviewDiaryId,
-                    id:response.data[i].id,
-                    isNewData:false
+                    id: response.data[i].id,
+                    isNewData: false
                 };
                 dataSource.value.push(newData)
             }
@@ -144,13 +152,23 @@ const handleAdd = () => {
         genreTrends: ``,
         persistence: ``,
         reviewDiaryId: props.id,
-        isNewData:true
+        isNewData: true
     };
     dataSource.value.push(newData);
 };
 const edit = key => {
     console.log('测试。。。。。。。。。。。key:', key);
     editableData[key] = cloneDeep(dataSource.value.filter(item => key === item.key)[0]);
+};
+const onDelete = (key) => {
+    axios.delete('http://127.0.0.1:5000/api/delete_subject',{
+      data: { id: data[key].id}}).then(response =>{
+        console.log('Response:', response);
+                message.success('删除成功', 3);
+      }).catch(error=>{
+        console.error('Error:', error);
+      })
+    dataSource.value = dataSource.value.filter(item => item.key !== key);
 };
 const save = key => {
     console.log('id', props.id)
@@ -164,35 +182,33 @@ const save = key => {
     console.log('测试。。。。。。。。。。。data:', key, data[key]);
     // console.log('测试。。。。。。。。。。。dataSource:', key, dataSource.value.filter(item => key === item.key)[0]);
 
-    if(data[key].isNewData)
-    {
-          axios.post('http://127.0.0.1:5000/api/addSubject', data[key])
-        .then(response => {
-            console.log('Response:', response);
-            // 处理成功响应，例如显示成功消息等
-            message.success('保存成功', 3);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // 处理错误响应，例如显示错误消息等
-        });
+    if (data[key].isNewData) {
+        axios.post('http://127.0.0.1:5000/api/addSubject', data[key])
+            .then(response => {
+                console.log('Response:', response);
+                // 处理成功响应，例如显示成功消息等
+                message.success('保存成功', 3);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 处理错误响应，例如显示错误消息等
+            });
     }
-    else
-    {
+    else {
         axios.post('http://127.0.0.1:5000/api/edit_subject', data[key])
-        .then(response => {
-            console.log('Response:', response);
-            // 处理成功响应，例如显示成功消息等
-            message.success('保存成功', 3);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // 处理错误响应，例如显示错误消息等
-        });
+            .then(response => {
+                console.log('Response:', response);
+                // 处理成功响应，例如显示成功消息等
+                message.success('保存成功', 3);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 处理错误响应，例如显示错误消息等
+            });
     }
-    
 
-  
+
+
     delete editableData[key];
 };
 const cancel = key => {

@@ -49,7 +49,7 @@
             </a-col>
         </a-row>
         <a-divider>题材回顾</a-divider>
-        <DtaTable :id="id" :type="type" :date="date"></DtaTable>
+        <DtaTable :id="reviewDiaryId" :type="type" :date="date"></DtaTable>
         <a-divider>明日板块与龙头人气股推演</a-divider>
         <a-form-item label="板块是否分歧" name="anyDifferencesSectors" style="min-width: 1500px;alignment: left">
             <a-textarea v-model:value="formState.anyDifferencesSectors" :rows="2" />
@@ -69,7 +69,7 @@
     </a-form>
 </template>
 <script setup>
-import { reactive, onMounted, watch } from 'vue';
+import { reactive, onMounted, watch,ref } from 'vue';
 import DtaTable from '../components/DataTable'
 import axios from 'axios';
 import { message } from 'ant-design-vue';
@@ -79,6 +79,10 @@ const route = useRoute();
 const { id, type,date } = route.query;
 const finalType = type || 'add';
 console.log('接收到的参数:', { id, type: finalType ,date});
+
+const reviewDiaryId=ref(id)
+
+
 // const tableData = [];
 
 
@@ -166,13 +170,12 @@ function submit() {
         axios.post('http://127.0.0.1:5000/api/addDiary', formState)
             .then(response => {
                 console.log('Response:', response.data.id);
-                // 处理成功响应，例如显示成功消息等
-                id.value = response.data.id;
                 message.success('保存成功', response.data.id);
+                 reviewDiaryId.value= response.data.id;
+                console.log('submit..............id:', id);
             })
             .catch(error => {
                 console.error('Error:', error);
-                // 处理错误响应，例如显示错误消息等
             });
     }
     else
@@ -180,13 +183,12 @@ function submit() {
         axios.post('http://127.0.0.1:5000/api/edit_diary', formState)
             .then(response => {
                 console.log('Response:', response.data.id);
-                // 处理成功响应，例如显示成功消息等
-                id.value = response.data.id;
                 message.success('保存成功', response.data.id);
+                id.value = response.data.id;
+                
             })
             .catch(error => {
                 console.error('Error:', error);
-                // 处理错误响应，例如显示错误消息等
             });
 
 
