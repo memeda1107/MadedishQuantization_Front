@@ -31,13 +31,15 @@
 </template>
 <script setup>
 import { cloneDeep } from 'lodash-es';
-import { computed, reactive, ref ,onMounted} from 'vue';
+import { computed, reactive, ref, onMounted } from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
 
 const props = defineProps({
 
     id: Number,
+    type: String,
+    date: String
 
 })
 onMounted(() => {
@@ -47,18 +49,39 @@ onMounted(() => {
 
 function init() {
 
-axios.get('http://127.0.0.1:5000/api/get_subject', { params: { review_diary_id: props.id } }).then(response => {
-                console.log('table。。。。。。。。。。Response:', response)
-                for(let i=0;i<response.data.length;i++)
-                {
-                    dataSource.value.push(response.data[i])
-                }
-                // data=response;
-            })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // 处理错误响应，例如显示错误消息等
-                });
+    console.log('.........id', props.id)
+    console.log('.........type', props.type)
+    console.log('.........date', props.date)
+
+    if (props.type == "edit") {
+        axios.get('http://127.0.0.1:5000/api/get_subject', { params: { review_diary_id: props.id } }).then(response => {
+            console.log('table。。。。。。。。。。Response:', response)
+            for (let i = 0; i < response.data.length; i++) {
+                // key: `${count.value}`,
+                const newData = {
+                    key: `${count.value}`,
+                    core: response.data[i].core,
+                    pioneer: response.data[i].pioneer,
+                    middleArmy: response.data[i].middleArmy,
+                    numberOfLimitUp: response.data[i].numberOfLimitUp,
+                    increase: response.data[i].increase,
+                    genreTrends: response.data[i].genreTrends,
+                    persistence: response.data[i].persistence,
+                    // date: props.date,
+                    reviewDiaryId: response.data[i].reviewDiaryId,
+                    id:response.data[i].id,
+                    isNewData:false
+                };
+                dataSource.value.push(newData)
+            }
+            // data=response;
+        })
+            .catch(error => {
+                console.error('Error:', error);
+                // 处理错误响应，例如显示错误消息等
+            });
+    }
+
 
 }
 const columns = [
@@ -103,19 +126,13 @@ const columns = [
         width: '15%',
     },
 ];
-const data =[];
-// for (let i = 0; i < 2; i++) {
-//     data.push({
-//         key: i.toString(),
-//         name: `Edrward ${i}`,
-//         age: 32,
-//         address: `London Park no. ${i}`,
-//     });
-// }
-
+const data = [];
 const dataSource = ref(data);
 const editableData = reactive({});
-const count = computed(() => dataSource.value.length + 1);
+// const count = computed(() => dataSource.value.length + 1);
+const count = computed(() => dataSource.value.length);
+
+
 const handleAdd = () => {
     const newData = {
         key: `${count.value}`,
@@ -126,12 +143,13 @@ const handleAdd = () => {
         increase: 0,
         genreTrends: ``,
         persistence: ``,
-        date: null,
         reviewDiaryId: props.id,
+        isNewData:true
     };
     dataSource.value.push(newData);
 };
 const edit = key => {
+    console.log('测试。。。。。。。。。。。key:', key);
     editableData[key] = cloneDeep(dataSource.value.filter(item => key === item.key)[0]);
 };
 const save = key => {
@@ -141,9 +159,14 @@ const save = key => {
         return;
     }
     Object.assign(dataSource.value.filter(item => key === item.key)[0], editableData[key]);
-    debugger;
-    console.log('测试。。。。。。。。。。。:', key, data[key - 1]);
-    axios.post('http://127.0.0.1:5000/api/addSubject', data[key - 1])
+
+
+    console.log('测试。。。。。。。。。。。data:', key, data[key]);
+    // console.log('测试。。。。。。。。。。。dataSource:', key, dataSource.value.filter(item => key === item.key)[0]);
+
+    if(data[key].isNewData)
+    {
+          axios.post('http://127.0.0.1:5000/api/addSubject', data[key])
         .then(response => {
             console.log('Response:', response);
             // 处理成功响应，例如显示成功消息等
@@ -153,41 +176,25 @@ const save = key => {
             console.error('Error:', error);
             // 处理错误响应，例如显示错误消息等
         });
+    }
+    else
+    {
+        axios.post('http://127.0.0.1:5000/api/edit_subject', data[key])
+        .then(response => {
+            console.log('Response:', response);
+            // 处理成功响应，例如显示成功消息等
+            message.success('保存成功', 3);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // 处理错误响应，例如显示错误消息等
+        });
+    }
+    
+
+  
     delete editableData[key];
 };
-
-// 使用 reactive 定义响应式数据
-// const state = reactive({
-//   editableData: {}, // 存储正在编辑的行数据
-// });
-
-// // 方法定义
-// const save = async (key) => {
-//   try {
-//     console.log('传入的 key:', key);
-//     debugger;
-//     const rowToSave = state.editableData[key];
-//     console.log('cesssssssssssss',rowToSave);
-//     if (!rowToSave) return;
-
-//     // 发送请求
-//     const response = await axios.post('/api/addSubject', rowToSave);
-//     console.log('Response:', response);
-//     // 更新数据源
-//     const index = dataSource.value.findIndex(item => item.key === key);
-//     if (index !== -1) {
-//       dataSource[index] = { ...rowToSave };
-//     }
-
-//     // 清理状态
-//     delete state.editableData[key];
-//     message.success('保存成功');
-
-//   } catch (error) {
-//     console.error(error);
-//     message.error('保存失败');
-//   }
-// };
 const cancel = key => {
     delete editableData[key];
 };

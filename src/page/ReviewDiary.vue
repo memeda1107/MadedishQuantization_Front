@@ -49,7 +49,7 @@
             </a-col>
         </a-row>
         <a-divider>题材回顾</a-divider>
-        <DtaTable :id="id" :tableData="tableData"></DtaTable>
+        <DtaTable :id="id" :type="type" :date="date"></DtaTable>
         <a-divider>明日板块与龙头人气股推演</a-divider>
         <a-form-item label="板块是否分歧" name="anyDifferencesSectors" style="min-width: 1500px;alignment: left">
             <a-textarea v-model:value="formState.anyDifferencesSectors" :rows="2" />
@@ -76,10 +76,10 @@ import { message } from 'ant-design-vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const { id, type } = route.query;
+const { id, type,date } = route.query;
 const finalType = type || 'add';
-console.log('接收到的参数:', { id, type: finalType });
-const tableData = [];
+console.log('接收到的参数:', { id, type: finalType ,date});
+// const tableData = [];
 
 
 // const props = defineProps({
@@ -102,6 +102,7 @@ onMounted(() => {
 function init() {
     console.log('..............type', type)
     console.log('..............id', id)
+    console.log('..............date', date)
     if (type == "edit") {
         axios.get('http://127.0.0.1:5000/api/get_diary', {
             params: {
@@ -111,13 +112,19 @@ function init() {
             console.log('Response:', response);
             Object.assign(formState, response.data[0]);
             // 处理成功响应，例如显示成功消息等
-            
+
         })
             .catch(error => {
                 console.error('Error:', error);
                 // 处理错误响应，例如显示错误消息等
             });
     }
+    else
+    {
+        formState.recordDate=date;
+    }
+
+
 }
 
 // let type="add";
@@ -154,17 +161,37 @@ const onFinishFailed = errorInfo => {
 
 
 function submit() {
-    axios.post('http://127.0.0.1:5000/api/addDiary', formState)
-        .then(response => {
-            console.log('Response:', response.data.id);
-            // 处理成功响应，例如显示成功消息等
-            id.value = response.data.id;
-            message.success('保存成功', response.data.id);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // 处理错误响应，例如显示错误消息等
-        });
+    if (type == "add") {
+        console.log('............formState',formState)
+        axios.post('http://127.0.0.1:5000/api/addDiary', formState)
+            .then(response => {
+                console.log('Response:', response.data.id);
+                // 处理成功响应，例如显示成功消息等
+                id.value = response.data.id;
+                message.success('保存成功', response.data.id);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 处理错误响应，例如显示错误消息等
+            });
+    }
+    else
+    {
+        axios.post('http://127.0.0.1:5000/api/edit_diary', formState)
+            .then(response => {
+                console.log('Response:', response.data.id);
+                // 处理成功响应，例如显示成功消息等
+                id.value = response.data.id;
+                message.success('保存成功', response.data.id);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 处理错误响应，例如显示错误消息等
+            });
+
+
+    }
+
 }
 
 // console.log('Success:', values);

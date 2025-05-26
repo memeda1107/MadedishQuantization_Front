@@ -4,7 +4,7 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import { createEventId, INITIAL_EVENTS } from './event-utils'
+import { INITIAL_EVENTS } from './event-utils'
 import axios from 'axios';
 // import { forEach } from 'core-js/core/array'
 export default defineComponent({
@@ -74,17 +74,26 @@ export default defineComponent({
       this.calendarOptions.weekends = !this.calendarOptions.weekends // update a property
     },
     handleDateSelect(selectInfo) {
+      console.log('...............selectInfo',selectInfo.startStr)
       const vm = this;
-      return vm.$router.push({ name: "ReviewDiary", param: createEventId, selectInfo });
+      vm.$router.push({
+        name: "ReviewDiary",
+        query: {
+          id: null,
+          type: "add",
+          date:selectInfo.startStr
+        }
+      });
     },
     handleEventClick(clickInfo) {
-      console.log(clickInfo)
+      console.log('...............clickInfo',clickInfo.event.extendedProps)
       const vm = this;
       vm.$router.push({
         name: "ReviewDiary",
         query: {
           id: clickInfo.event.id,
-          type: "edit"
+          type: "edit",
+          // date:clickInfo.event.extendedProps.recordDate
         }
       });
     },
@@ -100,20 +109,20 @@ export default defineComponent({
   <div class='demo-app'>
     <div class='demo-app-sidebar'>
       <div class='demo-app-sidebar-section'>
-        <h2>Instructions</h2>
+        <h2></h2>
         <ul>
-          <li>Select dates and you will be prompted to create a new event</li>
-          <li>Drag, drop, and resize events</li>
-          <li>Click an event to delete it</li>
+          <li>行情总在绝望中诞生，在半信半疑中成长，在憧憬中成熟，在希望中毁灭。"——约翰·邓普顿</li>
+          <li>保住本金最重要。第二条：永远不要忘记第一条。——沃伦·巴菲特</li>
+          <li>看不懂、看不准、没把握时坚决不进场。</li>
         </ul>
       </div>
-      <div class='demo-app-sidebar-section'>
+      <!-- <div class='demo-app-sidebar-section'>
         <label>
           <input type='checkbox' :checked='calendarOptions.weekends' @change='handleWeekendsToggle' />
           toggle weekends
         </label>
-      </div>
-      <div class='demo-app-sidebar-section'>
+      </div> -->
+      <!-- <div class='demo-app-sidebar-section'>
         <h2>All Events ({{ currentEvents.length }})</h2>
         <ul>
           <li v-for='event in currentEvents' :key='event.id'>
@@ -121,17 +130,15 @@ export default defineComponent({
             <i>{{ event.title }}</i>
           </li>
         </ul>
-      </div>
+      </div> -->
     </div>
     <div class='demo-app-main'>
       <FullCalendar class='demo-app-calendar' :options='calendarOptions'>
         <template v-slot:eventContent='arg'>
-          <i :class="arg.event.income > 0 ? 'fa fa-arrow-up red' : 'fa fa-arrow-down green'"></i>
-          <i :style="{ color: arg.event.extendedProps.income > 0 ? 'red' : arg.event.extendedProps.income< 0 ? 'green' : 'inherit' }">
+          <i :style="{ color: arg.event.extendedProps.income > 0 ? 'red' : arg.event.extendedProps.income< 0 ? 'green' : 'inherit',fontSize: '20px'  } ">
             {{ arg.event.title }}
           </i>
-           <i>{{console.log('...............arg',arg.event.extendedProps.income)}}</i>
-          
+           <!-- <i>{{console.log('...............arg',arg.event.extendedProps.income)}}</i> -->
         </template>
       </FullCalendar>
     </div>
@@ -184,7 +191,7 @@ b {
 
 .fc {
   /* the calendar root */
-  max-width: 1100px;
+  max-width: 900px;
   margin: 0 auto;
 }
 </style>
