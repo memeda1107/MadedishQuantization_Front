@@ -6,6 +6,7 @@
 
 import { createApp } from "vue";
 import App from "./App.vue";
+import api from './api/request';
 // Vuetify
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
@@ -45,6 +46,7 @@ const vuetify = createVuetify({
 // createApp(App).use(vuetify).mount("#app");
 
 const app = createApp(App);
+app.config.globalProperties.$api = api; // 挂载到全局
 app.use(router); // 使用 router 实例
 app.use(vuetify);
 app.use(Antd)

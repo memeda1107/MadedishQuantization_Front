@@ -5,8 +5,9 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { INITIAL_EVENTS } from './event-utils'
-import axios from 'axios';
+//import axios from 'axios';
 import dayjs from "dayjs";
+import api from '../api/request'; 
 // import { forEach } from 'core-js/core/array'
 export default defineComponent({
   components: {
@@ -51,15 +52,11 @@ export default defineComponent({
   },
   methods: {
     init() {
-      axios.get('http://127.0.0.1:5000/api/get_events')
-        .then(response => {
-          console.log('。。。。。。。。。。。。。。。。。。。Response:', response.data);
-          this.calendarOptions.events = response.data
-          console.log('。。。。。。。。。。。。。。。。。。。events:', this.calendarOptions.events);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+      api.get('/api/get_events').then(response => {
+        this.calendarOptions.events = response
+      }).catch(error => {
+        console.error('Error:', error);
+      })
     },
 
     getColor(event) {
@@ -69,26 +66,26 @@ export default defineComponent({
       this.calendarOptions.weekends = !this.calendarOptions.weekends // update a property
     },
     handleDateSelect(selectInfo) {
-      console.log('...............selectInfo',selectInfo)
+      console.log('...............selectInfo', selectInfo)
       const vm = this;
       vm.$router.push({
         name: "ReviewDiary",
         query: {
           id: null,
           type: "add",
-          date:dayjs(selectInfo.startStr).format("YYYY-MM-DD")
+          date: dayjs(selectInfo.startStr).format("YYYY-MM-DD")
         }
       });
     },
     handleEventClick(clickInfo) {
-      console.log('...............clickInfo',clickInfo)
+      console.log('...............clickInfo', clickInfo)
       const vm = this;
       vm.$router.push({
         name: "ReviewDiary",
         query: {
           id: clickInfo.event.id,
           type: "edit",
-          date:clickInfo.event.startStr
+          date: clickInfo.event.startStr
         }
       });
     },
@@ -130,10 +127,11 @@ export default defineComponent({
     <div class='demo-app-main'>
       <FullCalendar class='demo-app-calendar' :options='calendarOptions'>
         <template v-slot:eventContent='arg'>
-          <i :style="{ color: arg.event.extendedProps.income > 0 ? 'red' : arg.event.extendedProps.income< 0 ? 'green' : 'inherit',fontSize: '18px'  } ">
+          <i
+            :style="{ color: arg.event.extendedProps.income > 0 ? 'red' : arg.event.extendedProps.income < 0 ? 'green' : 'inherit', fontSize: '18px' }">
             {{ arg.event.title }}
           </i>
-           <!-- <i>{{console.log('...............arg',arg.event.extendedProps.income)}}</i> -->
+          <!-- <i>{{console.log('...............arg',arg.event.extendedProps.income)}}</i> -->
         </template>
       </FullCalendar>
     </div>
