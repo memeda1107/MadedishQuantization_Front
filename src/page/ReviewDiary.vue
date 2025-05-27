@@ -1,4 +1,12 @@
 <template>
+    <a-layout>
+    <a-layout-header class="sticky-header">
+      <a-space direction="horizontal" size="large"  :style="{ width: '100%' }">
+        <i>记录日期：{{date}}</i>
+        <a-button type="primary" html-type="submit" @click="submit">提交</a-button>
+      </a-space>
+    </a-layout-header>
+<a-layout-content :style="{ paddingTop: headerHeight + 'px' }">
     <a-form :model="formState" name="basic" autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed"
         layout="horizontal" labelWrap="true">
         <div class="d-flex flex-wrap  ">
@@ -64,9 +72,11 @@
         <a-divider>明日买入\卖出方案</a-divider>
         <PlanDtaTable :id="reviewDiaryId" :type="type" :date="date"></PlanDtaTable>
         <a-form-item :wrapper-col="{ offset: 4, span: 16 }">
-            <a-button type="primary" html-type="submit" @click="submit">提交</a-button>
+            <!-- <a-button type="primary" html-type="submit" @click="submit">提交</a-button> -->
         </a-form-item>
     </a-form>
+</a-layout-content>
+</a-layout>
 </template>
 <script setup>
 import { reactive, onMounted, watch,ref } from 'vue';
@@ -84,12 +94,13 @@ console.log('接收到的参数:', { id, type: finalType ,date});
 const reviewDiaryId=ref(id)
 
 
-// const tableData = [];
+const headerHeight = ref(64) // 默认高度
+// const isSticky = ref(false)
 
-
-// const props = defineProps({
-// type: String
-//  });
+// // 动态计算高度（响应式适配）
+// const updateHeaderHeight = () => {
+//   headerHeight.value = document.querySelector('.sticky-header')?.offsetHeight || 64
+// }
 
 watch(
     () => route.query.type,
@@ -200,3 +211,23 @@ function submit() {
 // console.log('Success:', values);
 // }
 </script>
+
+<style scoped>
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #ece8e8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* 覆盖 Ant Design 默认样式 */
+.ant-layout-header {
+  padding: 0 24px !important;
+  line-height: 64px !important;
+}
+
+.ant-layout-content {
+  margin: 0 !important;
+}
+</style>
