@@ -135,7 +135,7 @@ export default defineComponent({
     <div class='demo-app-main'>
       <FullCalendar class='demo-app-calendar' :options='calendarOptions'>
         <template v-slot:eventContent='arg'>
-          <i :style="{ color: arg.event.extendedProps.income > 0 ? 'red' : arg.event.extendedProps.income< 0 ? 'green' : 'inherit',fontSize: '20px'  } ">
+          <i :style="{ color: arg.event.extendedProps.income > 0 ? 'red' : arg.event.extendedProps.income< 0 ? 'green' : 'inherit',fontSize: '18px'  } ">
             {{ arg.event.title }}
           </i>
            <!-- <i>{{console.log('...............arg',arg.event.extendedProps.income)}}</i> -->

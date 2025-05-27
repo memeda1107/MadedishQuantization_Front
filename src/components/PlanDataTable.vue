@@ -1,9 +1,9 @@
 <template>
-    <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">新增</a-button>
-    <a-table :columns="columns" :data-source="dataSource" bordered>
+    <a-button class="editable-add-btn" style="margin-bottom: 8px " @click="handleAdd">新增</a-button>
+    <a-table :columns="columns" :data-source="dataSource" bordered :pagination="false">
         <template #bodyCell="{ column, text, record }">
             <template
-                v-if="['core', 'pioneer', 'middleArmy', 'numberOfLimitUp', 'middleArmy', 'increase', 'genreTrends', 'persistence'].includes(column.dataIndex)">
+                v-if="['subjectName','stockName', 'operate', 'expectOpen', 'operatePlan'].includes(column.dataIndex)">
                 <div>
                     <a-input v-if="editableData[record.key]" v-model:value="editableData[record.key][column.dataIndex]"
                         style="margin: -5px 0" />
@@ -62,23 +62,20 @@ function init() {
     console.log('.........date', props.date)
 
     if (props.type == "edit") {
-        axios.get('http://127.0.0.1:5000/api/get_subject', { params: { review_diary_id: props.id } }).then(response => {
+        axios.get('http://127.0.0.1:5000/api/getStockPlan', { params: { review_diary_id: props.id } }).then(response => {
             console.log('table。。。。。。。。。。Response:', response)
             for (let i = 0; i < response.data.length; i++) {
                 // key: `${count.value}`,
                 const newData = {
                     key: `${count.value}`,
-                    core: response.data[i].core,
-                    pioneer: response.data[i].pioneer,
-                    middleArmy: response.data[i].middleArmy,
-                    numberOfLimitUp: response.data[i].numberOfLimitUp,
-                    increase: response.data[i].increase,
-                    genreTrends: response.data[i].genreTrends,
-                    persistence: response.data[i].persistence,
-                    // date: props.date,
+                    stockName: response.data[i].stockName,
+                    operate: response.data[i].operate,
+                    expectOpen: response.data[i].expectOpen,
+                    operatePlan: response.data[i].operatePlan,
                     reviewDiaryId: response.data[i].reviewDiaryId,
                     id: response.data[i].id,
-                    isNewData: false
+                    isNewData: false,
+                    subjectName:response.data[i].subjectName
                 };
                 dataSource.value.push(newData)
             }
@@ -93,39 +90,29 @@ function init() {
 
 }
 const columns = [
-    {
-        title: '核心',
-        dataIndex: 'core',
-        width: '15%',
+     {
+        title: '题材',
+        dataIndex: 'subjectName',
+        width: '10%',
     },
     {
-        title: '先锋',
-        dataIndex: 'pioneer',
+        title: '股票名称',
+        dataIndex: 'stockName',
         width: '15%',
     },
-    {
-        title: '中军',
-        dataIndex: 'middleArmy',
-        width: '15%',
-    },
-    {
-        title: '涨停家数',
-        dataIndex: 'numberOfLimitUp',
+     {
+        title: '卖出或买入',
+        dataIndex: 'operate',
         width: '5%',
     },
     {
-        title: '涨幅',
-        dataIndex: 'increase',
-        width: '5%',
-    },
-    {
-        title: '题材趋势',
-        dataIndex: 'genreTrends',
+        title: '预期开盘',
+        dataIndex: 'expectOpen',
         width: '15%',
     },
     {
-        title: '持续性',
-        dataIndex: 'persistence',
+        title: '卖出或买入方案',
+        dataIndex: 'operatePlan',
         width: '15%',
     },
     {
@@ -144,15 +131,12 @@ const count = computed(() => dataSource.value.length);
 const handleAdd = () => {
     const newData = {
         key: `${count.value}`,
-        core: ``,
-        pioneer: ``,
-        middleArmy: ``,
-        numberOfLimitUp: 0,
-        increase: 0,
-        genreTrends: ``,
-        persistence: ``,
+        stockName: ``,
+        operate: ``,
+        expectOpen: ``,
+        operatePlan: ``,
         reviewDiaryId: props.id,
-        isNewData: true
+        isNewData: true,
     };
     dataSource.value.push(newData);
 };
@@ -161,7 +145,7 @@ const edit = key => {
     editableData[key] = cloneDeep(dataSource.value.filter(item => key === item.key)[0]);
 };
 const onDelete = (key) => {
-    axios.delete('http://127.0.0.1:5000/api/delete_subject',{
+    axios.delete('http://127.0.0.1:5000/api/deleteStockPlan',{
       data: { id: data[key].id}}).then(response =>{
         console.log('Response:', response);
                 message.success('删除成功', 3);
@@ -183,7 +167,7 @@ const save = key => {
     // console.log('测试。。。。。。。。。。。dataSource:', key, dataSource.value.filter(item => key === item.key)[0]);
 
     if (data[key].isNewData) {
-        axios.post('http://127.0.0.1:5000/api/addSubject', data[key])
+        axios.post('http://127.0.0.1:5000/api/addStockPlan', data[key])
             .then(response => {
                 console.log('Response:', response);
                 // 处理成功响应，例如显示成功消息等
@@ -195,7 +179,7 @@ const save = key => {
             });
     }
     else {
-        axios.post('http://127.0.0.1:5000/api/edit_subject', data[key])
+        axios.post('http://127.0.0.1:5000/api/editStockPlan', data[key])
             .then(response => {
                 console.log('Response:', response);
                 // 处理成功响应，例如显示成功消息等
