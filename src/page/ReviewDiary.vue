@@ -3,76 +3,111 @@
         <a-layout-header class="sticky-header">
             <a-space direction="horizontal" size="large" :style="{ width: '100%' }">
                 <i>记录日期：{{ date }}</i>
-                <a-button type="primary" html-type="submit" @click="submit">提交</a-button>
+                <a-button type="primary" html-type="submit" @click="submit" class="button">提交</a-button>
             </a-space>
         </a-layout-header>
-        <a-layout-content :style="{ paddingTop: headerHeight + 'px' }">
+        <a-layout-content id="form" :style="{ paddingTop: headerHeight + 'px' }">
             <a-form :model="formState" name="basic" autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed"
                 layout="horizontal" labelWrap="true">
                 <div class="d-flex flex-wrap  ">
-                    <a-form-item label="今日收益" name="income">
-                        <a-input-number v-model:value="formState.income" size="large" style="width: 100%" />
-                    </a-form-item>
-                    <a-form-item label="大盘走势" name="marketTrend">
-                        <a-input v-model:value="formState.marketTrend" size="large" style="width: 100%" />
-                    </a-form-item>
-                    <a-form-item label="大盘涨幅（%）" name="marketIncrease">
-                        <a-input-number v-model:value="formState.marketIncrease" size="large" style="width: 100%"
-                            :precision="2" :step="0.01" />
-                    </a-form-item>
-                    <a-form-item label="成交量（亿）" name="turnover">
-                        <a-input-number v-model:value="formState.turnover" size="large" style="width: 100%"
-                            :precision="2" :step="0.01" />
-                    </a-form-item>
-                    <a-form-item label="上涨家数" name="numberOfRising ">
-                        <a-input-number v-model:value="formState.numberOfRising" size="large" style="width: 100%" />
-                    </a-form-item>
-                    <a-form-item label="下跌家数" name="numberOfFalling ">
-                        <a-input-number v-model:value="formState.numberOfFalling" size="large" style="width: 100%" />
-                    </a-form-item>
-                    <a-form-item label="涨停家数" name="NumberOfLimitUp">
-                        <a-input-number v-model:value="formState.numberOfLimitUp" size="large" style="width: 100%" />
-                    </a-form-item>
-                    <a-form-item label="跌停家数" name="NumberOfLimitDown">
-                        <a-input-number v-model:value="formState.numberOfLimitDown" size="large" style="width: 100%" />
-                    </a-form-item>
-                    <a-form-item label="炸板率" name="explosionRate">
-                        <a-input-number v-model:value="formState.explosionRate" size="large" style="width: 100%"
-                            :precision="2" :step="0.01" />
-                    </a-form-item>
-                    <a-form-item label="昨日涨停" name="yesterdayLimitUp">
-                        <a-input-number v-model:value="formState.yesterdayLimitUp" size="large" style="width: 100%" />
-                    </a-form-item>
-                    <a-form-item label="昨日连板" name="yesterdayConnectingPlate">
-                        <a-input-number v-model:value="formState.yesterdayConnectingPlate" size="large"
-                            style="width: 100%" />
-                    </a-form-item>
-                    <a-form-item label="短线资金" name="ShortTermFunds">
-                        <a-input-number v-model:value="formState.shortTermFunds" size="large" style="width: 100%" />
-                    </a-form-item>
+                    <div class="form-label">
+                        <a-form-item label="今日收益(元)" name="income">
+                            <a-input-number v-model:value="formState.income" size="large" style="width: 100% ;"
+                                class="form-input" />
+                        </a-form-item>
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="大盘走势" name="marketTrend">
+                            <a-input v-model:value="formState.marketTrend" size="large" style="width: 100%"
+                                class="form-input" />
+                        </a-form-item>
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="大盘涨幅(%)" name="marketIncrease">
+                            <a-input-number v-model:value="formState.marketIncrease" size="large" style="width: 100%"
+                                :precision="2" :step="0.01" />
+                        </a-form-item>
+
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="成交量（亿）" name="turnover">
+                            <a-input-number v-model:value="formState.turnover" size="large" style="width: 100%"
+                                :precision="2" :step="0.01" />
+                        </a-form-item>
+
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="上涨家数" name="numberOfRising ">
+                            <a-input-number v-model:value="formState.numberOfRising" size="large" style="width: 100%" />
+                        </a-form-item>
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="下跌家数" name="numberOfFalling ">
+                            <a-input-number v-model:value="formState.numberOfFalling" size="large"
+                                style="width: 100%" />
+                        </a-form-item>
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="涨停家数" name="NumberOfLimitUp">
+                            <a-input-number v-model:value="formState.numberOfLimitUp" size="large"
+                                style="width: 100%" />
+                        </a-form-item>
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="跌停家数" name="NumberOfLimitDown">
+                            <a-input-number v-model:value="formState.numberOfLimitDown" size="large"
+                                style="width: 100%" />
+                        </a-form-item>
+
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="炸板率(%)" name="explosionRate">
+                            <a-input-number v-model:value="formState.explosionRate" size="large" style="width: 100%"
+                                :precision="2" :step="0.01" />
+                        </a-form-item>
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="昨日涨停" name="yesterdayLimitUp">
+                            <a-input-number v-model:value="formState.yesterdayLimitUp" size="large"
+                                style="width: 100%" />
+                        </a-form-item>
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="昨日连板" name="yesterdayConnectingPlate">
+                            <a-input-number v-model:value="formState.yesterdayConnectingPlate" size="large"
+                                style="width: 100%" />
+                        </a-form-item>
+                    </div>
+                    <div class="form-label">
+                        <a-form-item label="短线资金" name="ShortTermFunds">
+                            <a-input-number v-model:value="formState.shortTermFunds" size="large" style="width: 100%" />
+                        </a-form-item>
+                    </div>
                 </div>
                 <a-row>
                     <a-col :span="24">
                         <a-form-item label="整体盘面回顾" name="overallMarketReview"
-                            style="min-width: 1500px;alignment: left">
-                            <a-textarea v-model:value="formState.overallMarketReview" :rows="1" />
+                            style="min-width: 1500px;padding-left: 10px;">
+                            <a-textarea v-model:value="formState.overallMarketReview" :rows="2" />
                         </a-form-item>
                     </a-col>
                 </a-row>
                 <a-divider>题材回顾</a-divider>
                 <SubjectDtaTable :id="reviewDiaryId" :type="type" :date="date"></SubjectDtaTable>
                 <a-divider>明日板块与龙头人气股推演</a-divider>
-                <a-form-item label="板块是否分歧" name="anyDifferencesSectors" style="min-width: 1500px;alignment: left">
-                    <a-textarea v-model:value="formState.anyDifferencesSectors" :rows="1" />
+                <a-form-item label="板块是否分歧" name="anyDifferencesSectors" style="min-width: 1500px;padding-left: 10px;" >
+                    <a-textarea v-model:value="formState.anyDifferencesSectors" :rows="2" />
                 </a-form-item>
-                <a-form-item label="龙头预期" name="expectedLeaders" style="min-width: 1500px;alignment: left">
-                    <a-textarea v-model:value="formState.expectedLeaders" :rows="1" />
+                <a-form-item label="龙头预期" name="expectedLeaders" style="min-width: 1500px;padding-left: 10px;">
+                    <a-textarea v-model:value="formState.expectedLeaders" :rows="2" />
                 </a-form-item>
-                <a-form-item label="今日最优解是谁？为什么？" name="todayBestSolution" style="min-width: 1500px;alignment: left">
-                    <a-textarea v-model:value="formState.todayBestSolution" :rows="1" />
+                <a-form-item label="今日最优解是谁？为什么？" name="todayBestSolution"
+                    style="min-width: 1500px;padding-left: 10px;">
+                    <a-textarea v-model:value="formState.todayBestSolution" :rows="2" />
                 </a-form-item>
-                <a-form-item label="今日交易犯的错误，如何改进？" name="mistakesMadeToday" style="min-width: 1500px;alignment: left">
-                    <a-textarea v-model:value="formState.mistakesMadeToday" :rows="1" />
+                <a-form-item label="今日交易犯的错误，如何改进？" name="mistakesMadeToday"
+                    style="min-width: 1500px;padding-left: 10px;">
+                    <a-textarea v-model:value="formState.mistakesMadeToday" :rows="2" />
                 </a-form-item>
                 <a-divider>明日买入\卖出方案</a-divider>
                 <PlanDtaTable :id="reviewDiaryId" :type="type" :date="date"></PlanDtaTable>
@@ -91,12 +126,12 @@ import { useRoute } from 'vue-router';
 import api from '../api/request';
 
 const route = useRoute();
-const { id, type, date } = route.query;
+let { id, type, date } = route.query;
 const finalType = type || 'add';
 console.log('接收到的参数:', { id, type: finalType, date });
 
-const reviewDiaryId = ref(id)
-const headerHeight = ref(64) // 默认高度
+let reviewDiaryId = ref(id)
+const headerHeight = ref(20) // 默认高度
 watch(
     () => route.query.type,
     (newType) => {
@@ -161,18 +196,24 @@ function submit() {
     if (type == "add") {
         api.post('api/addDiary', formState)
             .then(response => {
-                message.success('保存成功');
+                console.log('..........response', response)
+                message.success('新增成功');
                 reviewDiaryId.value = response.id;
+                type = "edit";
+                // id=response.id;
+                Object.assign(formState, response);
+
             })
             .catch(error => {
                 console.error('Error:', error);
             });
     }
     else {
+        console.log('..........formState', formState)
         api.post('api/edit_diary', formState)
             .then(response => {
                 message.success('保存成功', response.data.id);
-                id.value = response.data.id;
+                id.value = response.id;
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -186,9 +227,16 @@ function submit() {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: #ece8e8;
+    background: #faf9f9;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 25px;
 }
+/* .button {
+    border-radius: 25px;
+    border: 2px solid #252524;
+    background: #f3f3f2;
+} */
+
 
 /* 覆盖 Ant Design 默认样式 */
 .ant-layout-header {
@@ -198,5 +246,14 @@ function submit() {
 
 .ant-layout-content {
     margin: 0 !important;
+}
+
+.form-label {
+    padding-left: 10px;
+    width: 20%;
+}
+
+.form-input {
+    padding-left: 10px;
 }
 </style>

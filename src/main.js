@@ -7,6 +7,8 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import api from './api/request';
+
+import './assets/Style/ComponentStyle.css'
 // Vuetify
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
@@ -16,6 +18,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import router from './router/index';
 
 import Antd from 'ant-design-vue';
+import * as antIcons from '@ant-design/icons-vue';
 import 'ant-design-vue/dist/reset.css';
 
 
@@ -46,6 +49,10 @@ const vuetify = createVuetify({
 // createApp(App).use(vuetify).mount("#app");
 
 const app = createApp(App);
+// 全局注册所有图标组件
+Object.keys(antIcons).forEach(key => {
+  app.component(key, antIcons[key]);
+});
 app.config.globalProperties.$api = api; // 挂载到全局
 app.use(router); // 使用 router 实例
 app.use(vuetify);
