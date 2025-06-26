@@ -5,12 +5,12 @@
       <!-- 弹窗容器 -->
       <div class="modal-container">
         <div class="modal-header">
-          <h3>用户登录</h3>
+          <h3>用户注册</h3>
           <span class="close-btn" @click="close">×</span>
         </div>
 
         <!-- 登录表单 -->
-        <a-form @submit.prevent="submit">
+        <a-form>
           <a-form-item label="用户名" name="userName">
                             <a-input v-model:value="formState.userName" size="large" style="width: 100%"
                                 class="form-input" />
@@ -19,9 +19,13 @@
                              <a-input v-model:value="formState.password" size="large" style="width: 100%"
                                 class="form-input" />
                         </a-form-item>
-                        <p class="toggle-text" @click="switchToRegister">没有账号？立即注册</p>
+                        <a-form-item label="确认密码" name="password">
+                             <a-input v-model:value="formState.confirmPassword" size="large" style="width: 100%"
+                                class="form-input" />
+                        </a-form-item>
+                        <p class="toggle-text" @click="switchToLogin">已有账号？立即登录</p>
                         <div style="margin: auto; width: 10%;">
-                          <a-button  type="primary" html-type="submit" @click="submit" class="button">登录</a-button>
+                          <a-button  type="primary" html-type="submit" @click="submit" class="button">注册</a-button>
                         </div>
         </a-form>
       </div>
@@ -34,28 +38,30 @@ export default {
   props: ['visible'],
   data() {
     return {
-      isShow:this.visible,
       formState: {
         userName: '',
-        password: ''
+        password: '',
+        confirmPassword: ''
       }
     }
-  },
-  watch()
-  {
-
-
   },
   methods: {
     close() {
       this.$emit('close')
     },
     submit() {
-      // 调用登录API
-      this.$emit('login', this.formState)
+      if (this.formState.password !== this.formState.confirmPassword) {
+        alert('两次密码输入不一致！')
+        return
+
+
+      }
+      // 调用注册API（示例）
+      this.$emit('register', this.formState)
+      this.close()
     },
-    switchToRegister() {
-      this.$emit('switch-to-register')
+    switchToLogin() {
+      this.$emit('switch-to-login')
     }
   }
 }

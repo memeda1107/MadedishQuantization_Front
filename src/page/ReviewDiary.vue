@@ -126,9 +126,9 @@ import { useRoute } from 'vue-router';
 import api from '../api/request';
 
 const route = useRoute();
-let { id, type, date } = route.query;
+let { id, type, date,userId } = route.query;
 const finalType = type || 'add';
-console.log('接收到的参数:', { id, type: finalType, date });
+console.log('接收到的参数:', { id, type: finalType, date,userId });
 
 let reviewDiaryId = ref(id)
 const headerHeight = ref(20) // 默认高度
@@ -180,7 +180,10 @@ const formState = reactive({
     expectedLeaders: '',
     todayBestSolution: '',
     mistakesMadeToday: '',
+    // recordDate: new Date().toLocaleDateString(),
     recordDate: new Date().toLocaleDateString(),
+    userId:''
+    // userId:this.$store.getters['user/currentUserId'],
 
 });
 const onFinish = values => {
@@ -194,6 +197,8 @@ const onFinishFailed = errorInfo => {
 
 function submit() {
     if (type == "add") {
+        formState.userId=userId;
+        console.log('formState',formState);
         api.post('api/addDiary', formState)
             .then(response => {
                 console.log('..........response', response)
@@ -226,7 +231,7 @@ function submit() {
 .sticky-header {
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 999;
     background: #faf9f9;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     border-radius: 25px;

@@ -46,9 +46,10 @@ const vuetify = createVuetify({
     }
 });
 
-// createApp(App).use(vuetify).mount("#app");
-
 const app = createApp(App);
+import store from './store';
+app.use(store);
+store.dispatch('user/initialize'); // 初始化登录状态
 // 全局注册所有图标组件
 Object.keys(antIcons).forEach(key => {
   app.component(key, antIcons[key]);

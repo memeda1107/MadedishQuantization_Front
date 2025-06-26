@@ -8,8 +8,16 @@
             </div>
             <div>
               <!-- <UserOutlined @click="showModal = true"></UserOutlined> -->
-               <button @click="showModal = true">登录</button>
-              <LoginModal :visible="showModal" @close="showModal = false" @login-success="handleLoginSuccess"/>
+               <div v-if="isAuthenticated">
+                <a  @click="shouLogout">你好，{{currentUserName}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <a style="font-style: italic;" @click="handleLogout">注销</a>
+                
+               </div>
+               <div v-else>
+                <button style="color: aliceblue;font-size: large;" @click="showLoginModal=true" >登录</button>
+               </div>
+              <LoginModal :visible="showLoginModal" @close="showLoginModal = false" @login="handleLogin" @switch-to-register="showRegister"/>
+              <RegisterModal :visible="showRegisterModal" @close="showRegisterModal = false" @register="handleRegister" @switch-to-login="showLogin"/>
             </div>
           </div>
         <!-- </a-space> -->
@@ -27,7 +35,7 @@
           <user-outlined />
           <span class="nav-text">复盘</span>
         </a-menu-item>
-        <a-menu-item key="3">
+        <!-- <a-menu-item key="3">
           <upload-outlined />
           <span class="nav-text">nav 3</span>
         </a-menu-item>
@@ -50,7 +58,7 @@
         <a-menu-item key="8">
           <shop-outlined />
           <span class="nav-text">nav 8</span>
-        </a-menu-item>
+        </a-menu-item> -->
       </a-menu>
     </a-layout-sider>
     <a-layout style="padding: 0 24px 24px">
@@ -67,41 +75,81 @@
   </a-layout>
 </template>
 <script>
-// import { ref } from 'vue';
-
-// import { UserOutlined } from '@ant-design/icons-vue';
 import LoginModal from './page/LoginPage.vue';
+import RegisterModal from './page/RegisterPage.vue'
+import api from './api/request';
+import { message } from 'ant-design-vue';
 export default {
   name: 'App',
   components: {
-    // UserOutlined
-    LoginModal
-
+     LoginModal,
+     RegisterModal,
   },
-  // const selectedKeys = ref(['4']);
-  
  data() {
     return {
-      showModal: false // 控制弹窗显示[1,3](@ref)
+      showModal: false ,
+      showLoginModal: false,
+      showRegisterModal: false,
     }
   },
+  watch:{
+    showLoginModal(newVal,oldVal)
+    {
+      console.log(newVal,oldVal);
+    }
 
+  },
+computed: {
+  isAuthenticated() {
+   let isAuthenticated= this.$store.getters['user/isAuthenticated']
+    console.log('isAuthenticated',isAuthenticated)
+    return isAuthenticated ;
+  },
+  currentUserName() {
+    console.log('currentUserName',this.$store.getters['user/currentUserName'])
+    return this.$store.getters['user/currentUserName'];
+  }
+},
   methods: {
     changeRoute(routeName) {
-      debugger;
-      console.log(routeName)
       const vm = this;
-
-      // vm.selectedIndex = selectedIndex;
-
       return vm.$router.push({ name: routeName });
     },
-     handleLoginSuccess() {
-      // 登录成功后的处理逻辑
-      console.log('用户登录成功!');
-      // 例如：更新用户状态、跳转页面等
+    showLogin() {
+       this.showLoginModal = true
+       this.showRegisterModal = false
+    },
+    showRegister() {
+      this.showRegisterModal = true
+      this.showLoginModal = false
+    },
+    handleLogin(credentials) {
+    this.$store.dispatch('user/login', {
+      userName: credentials.userName,
+      password: credentials.password
+    }).then(() => {
+      this.showLoginModal=false;
+      this.$router.push(this.$route.query.redirect || '/CalendarStock');
+    });
+    },
+    handleRegister(userData) {
+       api.post('api/addUser', userData)
+            .then(response => {
+                console.log('..........response', response)
+                message.success('注册成功');
+                this.showLogin()  
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    },
+    handleLogout()
+    {
+      this.$store.dispatch('user/logout').then(() => {
+        this.showLogin() 
+      this.$router.push('');
+    });
     }
-    
   }
 }
 
@@ -124,10 +172,10 @@ export default {
 .sticky-header {
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 998;
   background: #030303;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  height: 20%;
+  height: 10%;
 }
 
 .flex-container {

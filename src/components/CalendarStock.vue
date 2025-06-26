@@ -45,6 +45,7 @@ export default defineComponent({
         */
       },
       currentEvents: [],
+      userId:''
     }
   },
   mounted() {
@@ -52,7 +53,14 @@ export default defineComponent({
   },
   methods: {
     init() {
-      api.get('/api/get_events').then(response => {
+     let userId=this.$store.getters['user/currentUserId'];
+     this.userId=userId;
+    let userName= this.$store.getters['user/currentUserName'];
+     const pram={
+      userId:userId,
+      userName:userName
+     }
+      api.post('/api/get_diarys',pram).then(response => {
         this.calendarOptions.events = response
       }).catch(error => {
         console.error('Error:', error);
@@ -73,7 +81,8 @@ export default defineComponent({
         query: {
           id: null,
           type: "add",
-          date: dayjs(selectInfo.startStr).format("YYYY-MM-DD")
+          date: dayjs(selectInfo.startStr).format("YYYY-MM-DD"),
+          userId:this.userId,
         }
       });
     },
@@ -128,7 +137,7 @@ export default defineComponent({
       <FullCalendar class='demo-app-calendar' :options='calendarOptions'>
         <template v-slot:eventContent='arg'>
           <i
-            :style="{ color: arg.event.extendedProps.income > 0 ? 'red' : arg.event.extendedProps.income < 0 ? 'green' : 'inherit', fontSize: '18px' }">
+            :style="{ color: arg.event.extendedProps.income > 0 ? 'red' : arg.event.extendedProps.income < 0 ? 'green' : 'inherit', fontSize: '14px' }">
             {{ arg.event.title }}
           </i>
           <!-- <i>{{console.log('...............arg',arg.event.extendedProps.income)}}</i> -->
