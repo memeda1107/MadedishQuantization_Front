@@ -79,6 +79,7 @@ import LoginModal from './page/LoginPage.vue';
 import RegisterModal from './page/RegisterPage.vue'
 import api from './api/request';
 import { message } from 'ant-design-vue';
+import bcrypt from 'bcryptjs';
 export default {
   name: 'App',
   components: {
@@ -124,15 +125,18 @@ computed: {
       this.showLoginModal = false
     },
     handleLogin(credentials) {
+    const hashedPassword = bcrypt.hashSync(credentials.password, 10);
     this.$store.dispatch('user/login', {
       userName: credentials.userName,
-      password: credentials.password
+      password: hashedPassword
     }).then(() => {
       this.showLoginModal=false;
       this.$router.push(this.$route.query.redirect || '/CalendarStock');
     });
     },
     handleRegister(userData) {
+      const hashedPassword = bcrypt.hashSync(userData.password, 10);
+      userData.password=hashedPassword;
        api.post('api/addUser', userData)
             .then(response => {
                 console.log('..........response', response)
@@ -140,6 +144,7 @@ computed: {
                 this.showLogin()  
             })
             .catch(error => {
+              message.error(error.response.data.message)
                 console.error('Error:', error);
             });
     },

@@ -152,7 +152,7 @@ function init() {
             }
         }).then(response => {
             console.log('Response:', response);
-            Object.assign(formState, response[0]);
+            Object.assign(formState, response);
         })
             .catch(error => {
                 console.error('Error:', error);

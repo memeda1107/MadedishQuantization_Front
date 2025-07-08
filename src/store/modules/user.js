@@ -39,16 +39,17 @@ const mutations = {
     }
 };
 import api from '../../api/request';
+import { message } from 'ant-design-vue';
 
  const actions = {
   login({ commit }, credentials) {
-    // 必须 return Promise
     return api.post('/api/login', credentials).then(res => {
         commit('SET_USER', res);
+        message.success(res.message);
         return res; 
       })
       .catch(error => {
-        throw error; // 触发 .catch()
+        message.error(error.response.data.message);
       });
   },
 

@@ -10,18 +10,23 @@
         </div>
 
         <!-- 登录表单 -->
-        <a-form>
-          <a-form-item label="用户名" name="userName">
+        <a-form 
+        ref="formRef"
+        :model="formState" 
+        autocomplete="off"
+    @finish="onFinish"
+    @finishFailed="onFinishFailed">
+          <a-form-item label="用户名" name="userName" :rules="[{ required: true, message: '请输入用户名！' }]">
                             <a-input v-model:value="formState.userName" size="large" style="width: 100%"
-                                class="form-input" />
+                                class="form-input" @blur="handleBlur" />
                         </a-form-item>
-                        <a-form-item label="密    码" name="password">
+                        <a-form-item label="密    码" name="password" :rules="[{ required: true, pattern: /^[A-Za-z0-9]+$/, message: '仅支持字母和数字！'  }]">
                              <a-input v-model:value="formState.password" size="large" style="width: 100%"
-                                class="form-input" />
+                                class="form-input"  />
                         </a-form-item>
-                        <a-form-item label="确认密码" name="password">
+                        <a-form-item label="确认密码" name="password" :rules="[{ required: true,pattern: /^[A-Za-z0-9]+$/, message: '仅支持字母和数字！'}]">
                              <a-input v-model:value="formState.confirmPassword" size="large" style="width: 100%"
-                                class="form-input" />
+                                class="form-input"  />
                         </a-form-item>
                         <p class="toggle-text" @click="switchToLogin">已有账号？立即登录</p>
                         <div style="margin: auto; width: 10%;">
@@ -50,19 +55,31 @@ export default {
       this.$emit('close')
     },
     submit() {
-      if (this.formState.password !== this.formState.confirmPassword) {
+
+this.$refs.formRef.validate().then(() => {
+        if (this.formState.password !== this.formState.confirmPassword) {
         alert('两次密码输入不一致！')
         return
-
-
       }
       // 调用注册API（示例）
       this.$emit('register', this.formState)
       this.close()
+      }).catch(()=>{
+
+        console.log('验证不通过')
+      })
     },
     switchToLogin() {
       this.$emit('switch-to-login')
-    }
+    },
+    onFinish()
+    {
+
+    },
+    onFinishFailed()
+    {
+
+    },
   }
 }
 </script>

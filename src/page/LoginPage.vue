@@ -10,12 +10,13 @@
         </div>
 
         <!-- 登录表单 -->
-        <a-form @submit.prevent="submit">
-          <a-form-item label="用户名" name="userName">
+        <a-form ref="formRef"
+        :model="formState" >
+          <a-form-item label="用户名" name="userName" :rules="[{ required: true, message: '请输入用户名！' }]">
                             <a-input v-model:value="formState.userName" size="large" style="width: 100%"
                                 class="form-input" />
                         </a-form-item>
-                        <a-form-item label="密    码" name="password">
+                        <a-form-item label="密    码" name="password" :rules="[{ required: true, pattern: /^[A-Za-z0-9]+$/, message: '仅支持字母和数字！'}]">
                              <a-input v-model:value="formState.password" size="large" style="width: 100%"
                                 class="form-input" />
                         </a-form-item>
@@ -51,8 +52,12 @@ export default {
       this.$emit('close')
     },
     submit() {
-      // 调用登录API
-      this.$emit('login', this.formState)
+      this.$refs.formRef.validate().then(() => {
+        console.log('验证通过');
+        this.$emit('login', this.formState)
+      }).catch(()=>{
+        console.log('验证不通过');
+      });
     },
     switchToRegister() {
       this.$emit('switch-to-register')

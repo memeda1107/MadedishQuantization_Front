@@ -19,6 +19,7 @@
     "@fullcalendar/vue3": "^6.1.10",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.9.0",
+    "bcryptjs": "^3.0.2",
     "core-js": "^3.8.3",
     "dayjs": "^1.11.13",
     "vue": "^3.2.13",
