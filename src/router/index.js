@@ -75,7 +75,11 @@ router.beforeEach((to, from, next) => {
   } else {
     next();
   }
+ 
 });
+router.afterEach(() => {
+    document.title = '拼盘量化 ';
+})
 export default router;
 
 
